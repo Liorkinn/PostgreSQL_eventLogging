@@ -29,7 +29,7 @@ HEADERS += \
     mainwindow.h \
     resourse_card.h \
     xmlparser.h \
-    /home/liora/ControlProg/common_module/declaration_path.h \
+    /home/liora/protocolDB/common_module/declaration_path.h \
 
 FORMS += \
     mainwindow.ui \

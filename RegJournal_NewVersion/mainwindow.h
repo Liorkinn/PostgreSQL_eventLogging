@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include  "/home/liora/ControlProg/common_module/declaration_path.h"
+#include  "/home/liora/protocolDB/common_module/declaration_path.h"
 
 #include "xmlparser.h"
 #include "dbworker.h"

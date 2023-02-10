@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     CreateUI();
     ui->tableRecovery->setSelectionMode(QAbstractItemView::SingleSelection); /// < Устанавливаем в tableview одиночную выборку строк.
     ui->tableRecovery->setSelectionBehavior(QAbstractItemView::SelectRows); /// < Устанавливаем в tableview одиночную выборку строк.
+    ui->tableRecovery->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tabWidget->setCurrentWidget(ui->tab);
 
     if (xml.open(PATH_DATABASE)) {          ///< В самом начале открывается database.xml, тем самым при успешном открытии происходит наполнение std::vector и заполнение comboBox..
@@ -25,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
                                    dbworker[n].attribute("hostname"),
                                    dbworker[n].attribute("port").toInt(),
                                    dbworker[n].attribute("name"),
-                                   "lostdox1",
+                                   "1",
                                    "postgres",
                                    dbworker[n].attribute("options"));
 
@@ -52,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
                                 dbworker[i].attribute("hostname"),
                                 dbworker[i].attribute("port").toInt(),
                                 dbworker[i].attribute("name"),
-                                "lostdox1",
+                                "1",
                                 "postgres",
                                 dbworker[i].attribute("options"));
     });
@@ -163,7 +164,7 @@ void MainWindow::checkTreeWidget()
                        dbworker[i].attribute("hostname"),
                        dbworker[i].attribute("port").toInt(),
                        dbworker[i].attribute("name"),
-                       "lostdox1",
+                       "1",
                        "postgres",
                        dbworker[i].attribute("options"));
 
@@ -309,7 +310,7 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
                             dbworker[i].attribute("hostname"),
                             dbworker[i].attribute("port").toInt(),
                             dbworker[i].attribute("name"),
-                            "lostdox1",
+                            "1",
                             "postgres",
                             dbworker[i].attribute("options"));
 

@@ -54,7 +54,7 @@ void checkboxDelegate::updateEditorGeometry(QWidget *editor,
         editor->setGeometry(option.rect.adjusted(option.rect.width()/2-editorWidth/2,0,
                                                  option.rect.width()/2-editorWidth/2,0));
     if(index.siblingAtColumn(6).data() == "true") {
-        checkBox->setVisible(false);
+        checkBox->setEnabled(false);
     }
 }
 

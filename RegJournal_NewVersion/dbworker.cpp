@@ -43,7 +43,6 @@ void dbWorker::getControl(QTreeWidget *tree, QPushButton *button)
     schemaname = tree->selectionModel()->currentIndex().parent().siblingAtColumn(0).data().toString(); //схема
     tablename = tree->selectionModel()->currentIndex().siblingAtColumn(1).data().toString();  //таблица
     description = tree->selectionModel()->currentIndex().siblingAtColumn(2).data().toString(); //описание
- //   s_num = tree->selectionModel()->currentIndex().siblingAtColumn(3).data().toInt(); //номер
     db = QSqlDatabase::database();
 
 
@@ -58,10 +57,13 @@ void dbWorker::getControl(QTreeWidget *tree, QPushButton *button)
         s_num = res->sort;
         type_cont = res->type_oper;
          if(type_cont == "Жесткий") {
-             query->prepare("INSERT INTO chk.\"Table_state\"(description, schemaname, tablename, hard_control, sort_number) VALUES(:bdescription, :bschemaname, :btablename, :hardcontrol, :sortnum);");
+             query->prepare("INSERT INTO chk.\"Table_state\"(description, schemaname, tablename, insert, update, delete, hard_control, sort_number) VALUES(:bdescription, :bschemaname, :btablename, :insert, :update, :delete, :hardcontrol, :sortnum);");
              query->bindValue(":bdescription", description);
-             query->bindValue(":bschemaname", schemaname);
+             query->bindValue(":bschemaname", schemaname),
              query->bindValue(":btablename", tablename);
+             query->bindValue(":insert", "true");
+             query->bindValue(":update", "true");
+             query->bindValue(":delete", "true");
              query->bindValue(":hardcontrol", "true");
              query->bindValue(":sortnum", s_num);
              if(query->exec())
@@ -270,6 +272,7 @@ void dbWorker::settingTriggers(QComboBox *cmb, QTableView *tbl, const int &state
     {
         QString strInsert = "ALTER TABLE "  + schema +"." + '"' + tablename + '"' + " ENABLE TRIGGER journal_i;";
         if(query->exec(strInsert)){
+            updTableState(1, tbl);
             loggingDBAccess(1, cmb, tbl);
             qDebug() << "[Success] Триггер insert для таблицы " + schema +"." + '"' + tablename + '"' + " включён! Запрос: " + strInsert;}
         else{
@@ -280,6 +283,7 @@ void dbWorker::settingTriggers(QComboBox *cmb, QTableView *tbl, const int &state
     {
         QString strInsert = "ALTER TABLE "  + schema +"." + '"' + tablename + '"' + " DISABLE TRIGGER journal_i;";
         if(query->exec(strInsert)){
+            updTableState(2, tbl);
             loggingDBAccess(2, cmb, tbl);
             qDebug() << "[Success] Триггер insert для таблицы " + schema +"." + '"' + tablename + '"' + "выключен! Запрос: " + strInsert;}
         else{
@@ -291,6 +295,7 @@ void dbWorker::settingTriggers(QComboBox *cmb, QTableView *tbl, const int &state
     {
        QString strUpdate = "ALTER TABLE "  + schema +"." + '"' + tablename + '"' + " ENABLE TRIGGER journal_u;";
        if(query->exec(strUpdate)){
+            updTableState(3, tbl);
             loggingDBAccess(3, cmb, tbl);
            qDebug() << "[Success] Триггер update для таблицы " + schema +"." + '"' + tablename + '"' + "включен! Запрос: " + strUpdate;}
        else{
@@ -301,6 +306,7 @@ void dbWorker::settingTriggers(QComboBox *cmb, QTableView *tbl, const int &state
     {
         QString strUpdate = "ALTER TABLE "  + schema +"." + '"' + tablename + '"' + " DISABLE TRIGGER journal_u;";
         if(query->exec(strUpdate)){
+            updTableState(4, tbl);
             loggingDBAccess(4, cmb, tbl);
             qDebug() << "[Success] Триггер update для таблицы " + schema +"." + '"' + tablename + '"' + "выключен! Запрос: " + strUpdate;}
         else{
@@ -312,6 +318,7 @@ void dbWorker::settingTriggers(QComboBox *cmb, QTableView *tbl, const int &state
     {
         QString strDelete = "ALTER TABLE "  + schema +"." + '"' + tablename + '"' + " ENABLE TRIGGER journal_d;";
         if(query->exec(strDelete)){
+            updTableState(5, tbl);
             loggingDBAccess(5, cmb, tbl);
             qDebug() << "[Success] Триггер delete для таблицы " + schema +"." + '"' + tablename + '"' + "включен! Запрос: " + strDelete;}
         else{
@@ -325,6 +332,7 @@ void dbWorker::settingTriggers(QComboBox *cmb, QTableView *tbl, const int &state
     {
         QString strDelete = "ALTER TABLE "  + schema +"." + '"' + tablename + '"' + " DISABLE TRIGGER journal_d;";
         if(query->exec(strDelete)){
+            updTableState(6, tbl);
             loggingDBAccess(6, cmb, tbl);
         qDebug() << "[Success] Триггер delete для таблицы " + schema +"." + '"' + tablename + '"' + "выключен! Запрос: " + strDelete;}
         else{
@@ -419,6 +427,36 @@ void dbWorker::loggingDBAccess(int action, QComboBox *cmb, QTableView *tbl)
     default:
         break;
     }
+}
+
+void dbWorker::updTableState(int action, QTableView *tbl)
+{
+    QString schema      = tbl->selectionModel()->currentIndex().siblingAtColumn(1).data().toString();
+    QString tablename   = tbl->selectionModel()->currentIndex().siblingAtColumn(2).data().toString();
+    query = new QSqlQuery(db);
+    switch (action){
+    case 1:
+        query->exec("UPDATE chk.\"Table_state\" SET insert=true WHERE schemaname = '" + schema + "'" + "AND tablename = '" + tablename + "';");
+        break;
+    case 2:
+        query->exec("UPDATE chk.\"Table_state\" SET insert=false WHERE schemaname = '" + schema + "'" + "AND tablename = '" + tablename + "';");
+        break;
+    case 3:
+       query->exec("UPDATE chk.\"Table_state\" SET update=true WHERE schemaname = '" + schema + "'" + "AND tablename = '" + tablename + "';");
+        break;
+    case 4:
+       query->exec("UPDATE chk.\"Table_state\" SET update=false WHERE schemaname = '" + schema + "'" + "AND tablename = '" + tablename + "';");
+        break;
+    case 5:
+        query->exec("UPDATE chk.\"Table_state\" SET delete=true WHERE schemaname = '" + schema + "'" + "AND tablename = '" + tablename + "';");
+        break;
+    case 6:
+        query->exec("UPDATE chk.\"Table_state\" SET delete=false WHERE schemaname = '" + schema + "'" + "AND tablename = '" + tablename + "';");
+        break;
+    default:
+        break;
+    }
+
 }
 
 
