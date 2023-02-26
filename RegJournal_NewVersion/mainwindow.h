@@ -49,7 +49,7 @@ public:
     void checkTreeWidget();
     void AddElements();
     void create_UI( const QStringList &headers );
-
+    QString addSymbol(QString letters);
 
     void CreateUI();
 

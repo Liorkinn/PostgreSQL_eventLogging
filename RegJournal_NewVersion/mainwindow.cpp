@@ -325,7 +325,39 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
 
 
 
+QString MainWindow::addSymbol(QString letters)
+{
+    int index = 0;
+    if(letters.isEmpty())
+        return 0;
+
+    int a = letters.indexOf("(");
+    letters = letters.insert(a+1, "'");
+    a = letters.indexOf(")");
+    letters = letters.insert(a, "'");
+
+    foreach (QString a, letters) {
+       if(a == ",") {
+           index++;
+           letters = letters.insert(index-1, "'"); index++;
+           letters = letters.insert(index, "'"); index++;
+       }else {
+           index++;
+       }
+    }
+    return letters;
+}
+
 void MainWindow::on_pushButton_clicked()
 {
+    QString basename = ui->tableRecovery->selectionModel()->currentIndex().siblingAtColumn(1).data().toString(); //описание
+    QString schemaname = ui->tableRecovery->selectionModel()->currentIndex().siblingAtColumn(5).data().toString(); //схема
+    QString tablename = ui->tableRecovery->selectionModel()->currentIndex().siblingAtColumn(2).data().toString();  //таблица
+    QString sql_data = ui->tableRecovery->selectionModel()->currentIndex().siblingAtColumn(6).data().toString(); //описание
 
+    system(qPrintable("/home/liora/MIS_eventLogging/recovery.sh " + basename + " " + schemaname + " " + tablename + " " + "\"" + addSymbol(sql_data) + "\""));
+    qDebug() << addSymbol(sql_data);
+    auto rows = ui->tableRecovery->currentIndex();
+    ui->tableRecovery->model()->removeRow(rows.row());//..
 }
+
